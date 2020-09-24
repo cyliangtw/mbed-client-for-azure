@@ -19,13 +19,17 @@ static uint64_t system_tick_counter_read(void)
 {
     uint64_t result;
     uint32_t t;
+    uint32_t bits;
+    uint32_t mask;
 
     core_util_critical_section_enter();
     t = us_ticker_read();
     if (t < last_ticker_us)
     {
         // overflowed
-        long_ticker_ms += 0xFFFFFFFF / 1000;
+        bits = us_ticker_get_info()->bits;
+        mask = (1 << bits) - 1;
+        long_ticker_ms += mask / 1000;
     }
     last_ticker_us = t;
 
